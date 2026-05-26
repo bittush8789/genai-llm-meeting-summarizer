@@ -274,6 +274,50 @@ The Frontend interface will be exposed on: **`http://localhost:8080`**.
 
 We employ a local multinode cluster targeting production simulations.
 
+### Deployment & System Architecture
+
+```text
+                                  [ USER / WEB BROWSER ]
+                                            |
+                                            | Port 80 (HTTP)
+                                            v
+                               +-------------------------+
+                               |     KIND CLUSTER        |
+                               |  (Ingress Controller)   |
+                               +------------+------------+
+                                            |
+                         +------------------+------------------+
+                         | Ingress Routing                     | Ingress Routing
+                         | Path: /                             | Path: /upload
+                         v                                     v
+             +-----------------------+             +-----------------------+
+             |   FRONTEND SERVICE    |             |    BACKEND SERVICE    |
+             |      (NodePort)       |             |     (ClusterIP)       |
+             +-----------+-----------+             +-----------+-----------+
+                         |                                     |
+                +--------+--------+                   +--------+--------+
+                |                 |                   |                 |
+                v                 v                   v                 v
+          [ FRONTEND POD ]  [ FRONTEND POD ]    [ BACKEND POD ]   [ BACKEND POD ]
+            (Nginx Web)       (Nginx Web)         (FastAPI App)     (FastAPI App)
+                                                       |                 |
+                                      +----------------+--------+--------+----------------+
+                                      |                         |                         |
+                                      v                         v                         v
+                           +--------------------+    +--------------------+    +--------------------+
+                           |   MYSQL SERVICE    |    |  CHROMADB SERVICE  |    |     EXTERNAL API   |
+                           |    (ClusterIP)     |    |    (ClusterIP)     |    |       (HTTPS)      |
+                           +---------+----------+    +---------+----------+    +---------+----------+
+                                     |                         |                         |
+                                     v                         v                         v
+                              [ MYSQL POD ]             [ CHROMADB POD ]             [ GROQ API ]
+                              (Port 3306)               (Port 8000)
+                                     |                         |
+                                     v (PVC mount)             v (PVC mount)
+                              [ mysql-pvc ]             [ chromadb-pvc ]
+                                (Storage)                 (Storage)
+```
+
 ### Cluster Topology Definition (`kind-config.yaml`)
 - **1 Control Plane Node**: Matches system configuration parameters.
 - **2 Worker Nodes**: Distributes service replication workloads.
