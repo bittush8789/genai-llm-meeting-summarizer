@@ -6,11 +6,13 @@
   <img src="https://img.shields.io/badge/LangChain-1.3.1%2B-1C3C3A?style=for-the-badge&logo=chainlink&logoColor=white" alt="LangChain" />
   <img src="https://img.shields.io/badge/MySQL-8.0%2B-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL" />
   <img src="https://img.shields.io/badge/ChromaDB-Vector-orange?style=for-the-badge&logo=databricks&logoColor=white" alt="ChromaDB" />
+  <img src="https://img.shields.io/badge/Docker-Container-blue?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/Kubernetes-Orchestration-blue?style=for-the-badge&logo=kubernetes&logoColor=white" alt="Kubernetes" />
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License" />
 </p>
 
 <p align="center">
-  <strong>An enterprise-grade, asynchronous full-stack application designed to transcribe conversational audio, perform parallel analytical summarization, extract structured deliverables, and index meetings into relational and high-dimensional vector databases.</strong>
+  <strong>An enterprise-grade, asynchronous full-stack application designed to transcribe conversational audio, perform parallel analytical summarization, extract structured deliverables, and index meetings into relational and high-dimensional vector databases. Now fully packaged for modern containerized cloud workflows.</strong>
 </p>
 
 ---
@@ -23,15 +25,16 @@
 - [4. Processing Pipeline Workflow](#4-processing-pipeline-workflow)
 - [5. Technical Stack Specifications](#5-technical-stack-specifications)
 - [6. Directory Architecture](#6-directory-architecture)
-- [7. Functional Modules Overview](#7-functional-modules-overview)
-- [8. API Specifications](#8-api-specifications)
-- [9. Database Schema Design](#9-database-schema-design)
-- [10. Frontend UI Design Systems](#10-frontend-ui-design-systems)
-- [11. Quick-Start & Installation Guide](#11-quick-start--installation-guide)
+- [7. Local Quick-Start & Installation Guide](#7-local-quick-start--installation-guide)
+- [8. Docker Setup & Composition](#8-docker-setup--composition)
+- [9. KIND Cluster Architecture & Setup](#9-kind-cluster-architecture--setup)
+- [10. Kubernetes Manifest Deployments](#10-kubernetes-manifest-deployments)
+- [11. CI/CD GitHub Actions Workflow](#11-cicd-github-actions-workflow)
 - [12. Environmental Configurations](#12-environmental-configurations)
-- [13. Future Roadmap](#13-future-roadmap)
-- [14. Application Visual Previews](#14-application-visual-previews)
-- [15. License](#15-license)
+- [13. API Documentation](#13-api-documentation)
+- [14. Git Branching Workflow & DevOps Standard](#14-git-branching-workflow--devops-standard)
+- [15. Application Visual Previews](#15-application-visual-previews)
+- [16. License](#16-license)
 
 ---
 
@@ -51,11 +54,6 @@ This application introduces a unified **Asynchronous Processing Pipeline** that 
 *   **Relational Action Checklist (MySQL)**: Commits meetings and structures tasks into an active checklist to ensure absolute delivery accountability.
 *   **Semantic Retrieval Storage (ChromaDB)**: Chunks, encodes, and indexes transcripts into a persistent vector index, enabling instantaneous context retrieval for future semantic question-answering.
 
-### Key Business Advantages
-- **Elimination of Admin Friction**: Removes manual note-taking entirely, instantly converting conversation audio files or pasted notes into actionable insights.
-- **Accurate Action Tracking**: Uses deep linguistic structure extraction to guarantee that all tasks, due dates, and assigned owners are categorized dynamically.
-- **Corporate Knowledge Retrieval**: Leverages a dual-database pattern (relational transactional entries and high-dimensional semantic vectors) to create searchable archives of organizational intelligence.
-
 ---
 
 ## 2. Core Features
@@ -66,9 +64,7 @@ This application introduces a unified **Asynchronous Processing Pipeline** that 
 *   **Speech-to-Text Layer**: Run local, offline OpenAI Whisper (`base`/`tiny` weights running efficiently on CPU) or configure Groq cloud-based Whisper APIs.
 *   **Modern AI Analysis (LCEL)**: Built on parallel LangChain Expression Language (LCEL) chains connected to high-performance inference models via Groq API.
 *   **Action & Decision Engines**: Intelligent regex parsing and named-entity extraction to structure deliverables, complete with assignees and checkboxes.
-*   **Transactional MySQL Layer**: Automatic database and relational schema setup to hold structural meeting metadata and checklists.
-*   **Semantic ChromaDB Index**: Text splitting, paragraph normalization, and local vector generation using `sentence-transformers` (`all-MiniLM-L6-v2`) for vector indexing.
-*   **Premium CSS Light-Theme UI**: A highly responsive single-page client interface built with micro-shadows, modern type hierarchies, responsive cards, and dynamic status bars.
+*   **Production DevOps Infrastructure**: Out-of-the-box support for multi-stage Docker builds, Kubernetes manifests, KIND multi-node clusters, and automated GitHub Actions CI/CD workflows.
 
 ---
 
@@ -82,32 +78,32 @@ The system employs a clean, modular full-stack architecture separating the clien
                                   |     (HTML5, CSS3, ES6 JavaScript)     |
                                   +---------+-------------------+---------+
                                             |                   |
-                               Audio Stream | Form-Data         | Pasted Text
-                                            v                   v
+                                Audio Stream | Form-Data         | Pasted Text
+                                             v                   v
                                   +---------------------------------------+
                                   |         FASTAPI APP GATEWAY           |
                                   |           (REST Router, CORS)         |
                                   +---------+-------------------+---------+
                                             |                   |
-                                   If Audio |                   | If Text / Direct
-                                            v                   v
-+-------------------------------------------+---+   +-----------+-----------------------+
-|          SPEECH-TO-TEXT MACHINE           |   |       LANGCHAIN INFERENCE PIPES       |
-|    (OpenAI Whisper Local / Cloud Engine)  |   |  (Parallel LCEL Extraction Chains)    |
-+-------------------------------------------+---+   +-----------+-----------------------+
-                                            |                   |
-                                            +-------------------+
-                                                                |
-                                                                v
-                                              [ Highly Structured JSON Outcome ]
-                                                                |
-                                  +-----------------------------+-----------------------------+
-                                  |                                                           |
-                                  v                                                           v
-                     +----------------------------+                              +----------------------------+
-                     |    MYSQL TRANSACTION DB    |                              |     CHROMADB VECTOR DB     |
-                     | (Relational Checklist Core)|                              |  (Sentence-Transformer L6) |
-                     +----------------------------+                              +----------------------------+
+                                     If Audio |                   | If Text / Direct
+                                              v                   v
+  +-------------------------------------------+---+   +-----------+-----------------------+
+  |          SPEECH-TO-TEXT MACHINE           |   |       LANGCHAIN INFERENCE PIPES       |
+  |    (OpenAI Whisper Local / Cloud Engine)  |   |  (Parallel LCEL Extraction Chains)    |
+  +-------------------------------------------+---+   +-----------+-----------------------+
+                                              |                   |
+                                              +-------------------+
+                                                                  |
+                                                                  v
+                                                [ Highly Structured JSON Outcome ]
+                                                                  |
+                                    +-----------------------------+-----------------------------+
+                                    |                                                           |
+                                    v                                                           v
+                       +----------------------------+                              +----------------------------+
+                       |    MYSQL TRANSACTION DB    |                              |     CHROMADB VECTOR DB     |
+                       | (Relational Checklist Core)|                              |  (Sentence-Transformer L6) |
+                       +----------------------------+                              +----------------------------+
 ```
 
 ---
@@ -127,12 +123,12 @@ The execution pipeline transforms input data through eight distinct processing s
 
 1.  **Ingestion**: Client initiates request by sending an audio binary or plain text payload via multipart form-data.
 2.  **Gatekeeping**: FastAPI middleware validates format extensions, boundaries, and safety configurations.
-3.  **Transcription (Audio track only)**: Whisper converts audio data into structured raw sentences. Paster track bypasses this state instantly.
-4.  **Prompt Routing**: Raw text is converted into prompt records and routed to parallel LangChain Expression Language pipelines.
+3.  **Transcription (Audio track only)**: Whisper converts audio data into structured raw sentences.
+4.  **Prompt Routing**: Raw text is routed to parallel LangChain Expression Language pipelines.
 5.  **LLM Analytical Inference**: Parallel chains execute to produce summaries, extract decisions, and compile deliverables.
 6.  **Transactional Commit**: PyMySQL processes records and updates table spaces with transactional meeting IDs.
-7.  **Vector Embedding**: Sentence-Transformers vectorizes paragraph-chunks into 384-dimensional dense semantic representations and updates the Chroma collection.
-8.  **DOM Rehydration**: JavaScript rehydrates the DOM, rendering active checklist elements and expanding sections.
+7.  **Vector Embedding**: Sentence-Transformers vectorizes paragraph-chunks and updates the Chroma collection.
+8.  **DOM Rehydration**: JavaScript rehydrates the DOM, rendering active checklist elements.
 
 ---
 
@@ -148,11 +144,8 @@ The execution pipeline transforms input data through eight distinct processing s
 | **Speech-to-Text** | OpenAI Whisper (Local) | `Whisper 202506` | Offline CPU compliance, local cache capability. |
 | **Relational DB** | MySQL Server | `MySQL 8.0` | Secure schemas, strict primary foreign key compliance, quick index reads. |
 | **Vector DB** | ChromaDB Persistent Client | `ChromaDB 1.5.9` | In-process DB footprint, integrated sentence-transformer indexes. |
-
-### Neural Models Utilized
-*   **LLM Core**: `llama-3.3-70b-versatile` (Primary analytical parser) / `llama-3.1-8b-instant` (High-speed summarization fallback)
-*   **STT Engine**: Local Whisper `base` (Offline, balanced CPU runtime) / Whisper `tiny` (Rapid execution CPU runtime)
-*   **Embeddings**: Sentence-Transformers `all-MiniLM-L6-v2` (Local 384-dimensional dense retriever)
+| **Containers** | Docker / Compose | Engine `20.10+` | Containerization of services to enforce cross-platform runtime equity. |
+| **K8s Engine** | KIND (Kubernetes in Docker) | `v0.20+` | Micro-cluster provisioning targeting standard local development testing. |
 
 ---
 
@@ -161,7 +154,7 @@ The execution pipeline transforms input data through eight distinct processing s
 ```text
 ai-meeting-summarizer/
 ├── frontend/
-│   ├── index.html        # Clean DOM architecture and typography interfaces
+│   ├── index.html        # DOM architecture and typography interfaces
 │   ├── style.css         # Minimalist, polished light-theme CSS variables
 │   └── script.js         # RESTful integrations, DOM rehydration, & UX handlers
 ├── backend/
@@ -174,102 +167,37 @@ ai-meeting-summarizer/
 │   ├── services/
 │   │   ├── transcription.py  # Local Whisper engines and cloud APIs wrappers
 │   │   └── summarization.py  # Structured LangChain LCEL pipeline compilation
-│   ├── uploads/          # Temporary directory for uploaded audio cache (Auto-created)
-│   └── vectorstore/      # Persistent local database storage for vector nodes (Auto-created)
+│   ├── uploads/          # Temporary directory for uploaded audio cache
+│   └── vectorstore/      # Persistent local database storage for vector nodes
+├── docker/
+│   ├── backend.Dockerfile   # Multi-stage optimized builder & non-root runner
+│   └── frontend.Dockerfile  # Optimized Alpine-Nginx static publisher
+├── kubernetes/
+│   ├── namespace.yaml
+│   ├── configmap.yaml
+│   ├── secrets.yaml
+│   ├── mysql-pvc.yaml
+│   ├── mysql-deployment.yaml
+│   ├── mysql-service.yaml
+│   ├── chromadb-pvc.yaml
+│   ├── chromadb-deployment.yaml
+│   ├── chromadb-service.yaml
+│   ├── backend-deployment.yaml
+│   ├── backend-service.yaml
+│   ├── frontend-deployment.yaml
+│   ├── frontend-service.yaml
+│   └── ingress.yaml
+├── .github/
+│   └── workflows/
+│       └── deploy.yml    # Full CI/CD building, pushing, & automated deployment
+├── kind-config.yaml      # Multi-node local Kubernetes cluster definition
+├── docker-compose.yml    # Root-level multi-container testing configuration
 └── README.md
 ```
 
 ---
 
-## 7. Functional Modules Overview
-
-### Audio Processing Module
-Handles transactional file writes to `backend/uploads/` with size safety limits (50MB). Auto-detects codecs and routes wave binaries to either the local machine CPU Whisper engine or cloud engines. Instantly initiates local cleaning tasks to flush temp arrays on finalization.
-
-### AI Summarization Module
-Built upon modular LangChain LCEL pipe orchestration. Coordinates executive summary templates, pipelines conversational meeting streams to ChatGroq servers, and returns structured markdown files.
-
-### Action Extraction Module
-Uses localized NLP logic and detailed prompting to convert unstructured meeting records into operational tasks. Parses sentences to isolate assigned owners and formats action points into checkable lists.
-
-### Decision Extraction Module
-Scans transcripts for agreements, approvals, and formal choices. Converts verbose statements into brief bulleted sentences and handles fallback logic if no decisions are explicitly stated.
-
-### Vector Storage Module
-Utilizes Sentence-Transformers to segment transcripts into unified paragraph blocks. Generates vector representations and inserts elements along with metadata references directly into the ChromaDB index.
-
----
-
-## 8. API Specifications
-
-### `POST /upload`
-Triggers the full processing pipeline. Supports both audio upload and raw transcript text submissions.
-
-#### Request Parameters (Multipart Form-Data)
-*   `file` (*Optional Binary*): Conversational meeting recording audio.
-*   `transcript_text` (*Optional String*): Pre-written or pasted transcript text notes.
-*   `llm_model` (*String, default: "llama-3.3-70b-versatile"*): Selected analytical LLM model.
-*   `transcription_model` (*String, default: "local-whisper-base"*): Selected speech-to-text model.
-
-#### Success Response (`200 OK`)
-```json
-{
-  "success": true,
-  "id": 42,
-  "title": "Project Sync Notes",
-  "transcript": "Today we discussed Kubernetes deployment...",
-  "summary": "The team aligned on transitioning to AWS EKS...",
-  "decisions": "AWS EKS approved for production deployment.",
-  "action_items": [
-    "Configure SSL by Friday (Rahul)",
-    "Complete Terraform setup before Monday (Priya)"
-  ]
-}
-```
-
----
-
-## 9. Database Schema Design
-
-Structured relational model generated inside the `meeting_summarizer` table space:
-
-```sql
-CREATE TABLE meetings (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    transcript LONGTEXT,
-    summary TEXT,
-    decisions TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE action_items (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    meeting_id INT NOT NULL,
-    item TEXT NOT NULL,
-    status VARCHAR(50) DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (meeting_id) REFERENCES meetings(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-```
-
----
-
-## 10. Frontend UI Design Systems
-
-The client interface has been carefully styled to adhere to premium web product designs:
-- **Clean Space Aesthetics**: Clean margins (`gap: 24px`), large white cards, and structured layouts reduce visual noise.
-- **Harmony Color Palettes**: Leverages functional, refined CSS variables instead of stock colors:
-  *   Primary Brand Accent: `#2563eb` (Deep Royal Blue)
-  *   Subtle Borders: `#e2e8f0` (Clean Light Slate)
-  *   Success States: `#10b981` (Premium Emerald Green)
-- **Variable Typography**: Deeply integrated `Inter` typeface with variable thickness weights (`300` to `700`) for balanced content formatting.
-- **UI Transitions & Glows**: Active text inputs receive clean focus glows (`3px outline with 15% opacity`) and buttons support micro-transitions (`0.2s cubic-bezier`).
-- **Interactive Checklists**: Relational action item arrays render as premium checkable lists that apply visual strikethroughs instantly.
-
----
-
-## 11. Quick-Start & Installation Guide
+## 7. Local Quick-Start & Installation Guide
 
 Ensure you have **Python 3.10+** and a running **MySQL Server** instance before starting.
 
@@ -316,39 +244,210 @@ Navigate to: **`http://localhost:8000`**
 
 ---
 
+## 8. Docker Setup & Composition
+
+### Local Manual Building
+
+To manually build service images locally:
+```bash
+# Build Backend multi-stage optimized image
+docker build -t genai-backend:latest -f docker/backend.Dockerfile .
+
+# Build Frontend web hosting image
+docker build -t genai-frontend:latest -f docker/frontend.Dockerfile .
+```
+
+### Running with Docker Compose
+To boot the full multi-tier production environment locally in a single command:
+```bash
+# Run composition in detached mode
+docker-compose up -d
+
+# Verify all services are online and healthy
+docker-compose ps
+```
+The Frontend interface will be exposed on: **`http://localhost:8080`**.
+
+---
+
+## 9. KIND Cluster Architecture & Setup
+
+We employ a local multinode cluster targeting production simulations.
+
+### Cluster Topology Definition (`kind-config.yaml`)
+- **1 Control Plane Node**: Matches system configuration parameters.
+- **2 Worker Nodes**: Distributes service replication workloads.
+- **Port Mapping**: Explicit routing for inbound Ingress calls.
+
+### Initialize Cluster Setup
+```bash
+# Spin up the cluster using kind-config.yaml definition
+kind create cluster --config kind-config.yaml --name genai-meeting-cluster
+
+# Check cluster nodes
+kubectl get nodes
+```
+
+### Load Docker Images directly to KIND
+To bypass local registry constraints, you can load built images directly into KIND:
+```bash
+kind load docker-image genai-backend:latest --name genai-meeting-cluster
+kind load docker-image genai-frontend:latest --name genai-meeting-cluster
+```
+
+---
+
+## 10. Kubernetes Manifest Deployments
+
+We provide structured, highly modularized manifests inside `kubernetes/` adhering to GitOps principles.
+
+### Deploy All Cluster Manifests
+
+Execute creation order to populate resources sequentially:
+```bash
+# 1. Apply Namespace
+kubectl apply -f kubernetes/namespace.yaml
+
+# 2. ConfigMaps & Secret Bindings
+kubectl apply -f kubernetes/configmap.yaml
+kubectl apply -f kubernetes/secrets.yaml
+
+# 3. Persistent Storages
+kubectl apply -f kubernetes/mysql-pvc.yaml
+kubectl apply -f kubernetes/chromadb-pvc.yaml
+
+# 4. Relational & Vector Deployments + Services
+kubectl apply -f kubernetes/mysql-deployment.yaml
+kubectl apply -f kubernetes/mysql-service.yaml
+kubectl apply -f kubernetes/chromadb-deployment.yaml
+kubectl apply -f kubernetes/chromadb-service.yaml
+
+# 5. Core REST APIs & Frontend Web Deployments
+kubectl apply -f kubernetes/backend-deployment.yaml
+kubectl apply -f kubernetes/backend-service.yaml
+kubectl apply -f kubernetes/frontend-deployment.yaml
+kubectl apply -f kubernetes/frontend-service.yaml
+
+# 6. Ingress Rules Gateway
+kubectl apply -f kubernetes/ingress.yaml
+```
+
+### Install Nginx Ingress Controller on KIND
+To enable Ingress path parsing on KIND:
+```bash
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+```
+
+### Status Verifications
+```bash
+# Inspect all pods within the namespace
+kubectl get pods -n meeting-summarizer
+
+# Check services
+kubectl get svc -n meeting-summarizer
+
+# Inspect Ingress settings
+kubectl get ingress -n meeting-summarizer
+```
+
+---
+
+## 11. CI/CD GitHub Actions Workflow
+
+The automated deployment logic is managed via `.github/workflows/deploy.yml`.
+
+### Continuous Integration (CI) Phase
+1. **Source Checkout**: Imports the latest codebase branch.
+2. **Environment Readying**: Provisions Python and initializes cached dependencies.
+3. **Execution Verification**: Conducts code checks and automated tests.
+4. **Multi-Stage Build**: Compiles both Frontend & Backend images.
+5. **DockerHub Sync**: Publishes compiled image versions tagged with commit SHAs and `latest`.
+
+### Continuous Deployment (CD) Phase
+1. **Cluster Handshake**: Decodes `KUBE_CONFIG_DATA` to authenticate kubectl securely.
+2. **Resource Updates**: Inserts fresh secrets, pulls correct image iterations, and executes resource application.
+3. **Progress Tracking**: Tracks rollout statuses (`kubectl rollout status`) to guarantee absolute zero-downtime rehydration.
+
+---
+
 ## 12. Environmental Configurations
 
-The system looks for key variables to bootstrap critical pipelines:
-- `GROQ_API_KEY`: Groq API authorization token.
-- `DB_HOST` / `DB_PORT`: Destination address and port space of the MySQL server.
-- `DB_USER` / `DB_PASSWORD`: SQL server credential validation records.
-- `DB_NAME`: Working database workspace (Defaults to `meeting_summarizer`).
+The backend looks for these critical environment variables:
+
+| Variable Name | Description | Default / Source |
+| :--- | :--- | :--- |
+| `GROQ_API_KEY` | Groq authorization token | Loaded from Secrets |
+| `DB_HOST` | Host address of target MySQL server | `mysql-service` (Kubernetes) |
+| `DB_PORT` | MySQL connection port | `3306` |
+| `DB_USER` | MySQL authenticated user | `root` |
+| `DB_PASSWORD` | Password matched to user record | Loaded from Secrets |
+| `DB_NAME` | Active working SQL namespace | `meeting_summarizer` |
+| `CHROMADB_HOST` | ChromaDB instance target | `chromadb-service` |
+| `CHROMADB_PORT` | ChromaDB target REST port | `8000` |
 
 ---
 
-## 13. Future Roadmap
+## 13. API Documentation
 
-- [ ] **Conversational RAG Panel**: Ask historical meeting questions directly from a slide-out sidebar interface.
-- [ ] **Speaker Diarization**: Multi-speaker clustering using neural frequency weights to label participants.
-- [ ] **WebSockets Audio Streaming**: Stream mic inputs directly from the browser window in real-time.
-- [ ] **Multi-Language Support**: Real-time translations to Spanish, German, French, and Japanese.
-- [ ] **Direct Platform Syncs**: Integrated webhooks to sync meetings to Jira, Slack, or Notion.
+### `POST /upload`
+Processes a new meeting session audio or pasted markdown text records.
+
+#### Content-Type: `multipart/form-data`
+
+#### Multipart Form Elements:
+- `file` (*Optional Binary*): Audio file (WAV, MP3, M4A, OGG, or FLAC).
+- `transcript_text` (*Optional String*): Manually pasted meeting transcripts.
+- `llm_model` (*String, default: "llama-3.3-70b-versatile"*): Analytics parser instance.
+- `transcription_model` (*String, default: "local-whisper-base"*): Choice of model for speech transcription.
+
+#### Response Output (`200 OK`)
+```json
+{
+  "success": true,
+  "id": 1,
+  "title": "Board Sync notes",
+  "transcript": "Today we discussed Kubernetes deployment...",
+  "summary": "The team agreed to deploy to KIND cluster...",
+  "decisions": "Approved transition to containerized setup.",
+  "action_items": [
+    "Rahul to configure SSL by Friday",
+    "Priya to configure K8s manifests"
+  ]
+}
+```
 
 ---
 
-## 14. Application Visual Previews
+## 14. Git Branching Workflow & DevOps Standard
+
+To contribute new additions to the DevOps configuration, follow this standard branch lifecycle:
+
+### 1. Checkout a dedicated Feature Branch
+```bash
+git checkout -b cicd
+```
+
+### 2. Commit modifications
+Ensure all configurations adhere to declarative parameters:
+```bash
+git add .
+git commit -m "feat: implement complete multi-node KIND cluster, docker-compose, and CI/CD"
+```
+
+### 3. Push feature branch to origin
+```bash
+git push origin cicd
+```
+
+---
+
+## 15. Application Visual Previews
 
 ### Application Dashboard & Manual Transcript Interface
 ![Application Dashboard](photo/image.png)
 
 ---
 
-## 15. License
+## 16. License
 
 Distributed under the MIT License. See `LICENSE` for more information.
-
----
-
-<p align="center">
-  <strong>AI Meeting Notes Summarizer</strong> — Transforming corporate speech data into structured organizational assets.
-</p>

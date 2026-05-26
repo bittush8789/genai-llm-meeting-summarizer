@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: summarizer-config
+  namespace: meeting-summarizer
+data:
+  MYSQL_HOST: "mysql-service"
+  MYSQL_PORT: "3306"
+  MYSQL_USER: "root"
+  MYSQL_DB: "meeting_summarizer"
+  CHROMADB_HOST: "chromadb-service"
+  CHROMADB_PORT: "8000"
