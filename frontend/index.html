@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Meeting Notes Summarizer</title>
+    <!-- Google Fonts: Inter for elegant minimalist typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">
+                <span class="icon">📝</span>
+                <h1>AI Meeting Notes Summarizer</h1>
+            </div>
+            <p class="subtitle">Transform meeting audio into clean summaries, action items, and decisions instantly.</p>
+        </header>
+
+        <!-- Main Content Grid -->
+        <main class="main-content">
+            <!-- Upload Section -->
+            <section class="card upload-card" id="upload-section">
+                <div class="upload-area" id="drop-zone">
+                    <div class="upload-icon">📥</div>
+                    <h3>Drag & Drop Meeting Audio</h3>
+                    <p>Supports WAV, MP3, M4A, OGG, or FLAC up to 50MB</p>
+                    <div class="file-select-container">
+                        <label for="audio-file" class="btn-secondary">Choose File</label>
+                        <input type="file" id="audio-file" accept="audio/*" style="display: none;">
+                    </div>
+                    <div class="selected-file-info" id="selected-file-info" style="display: none;">
+                        <span class="file-name" id="file-name">filename.wav</span>
+                        <button class="btn-remove" id="btn-remove">✕</button>
+                    </div>
+                </div>
+                <div class="model-settings">
+                    <div class="setting-group">
+                        <label for="transcription-model">Speech-to-Text Model</label>
+                        <select id="transcription-model" class="select-field">
+                            <option value="local-whisper-base" selected>Local Whisper Base (Offline, Balanced)</option>
+                            <option value="local-whisper-tiny">Local Whisper Tiny (Offline, Super Fast)</option>
+                            <option value="whisper-large-v3">Groq Whisper Large V3 (Cloud API, Accurate)</option>
+                            <option value="whisper-large-v3-turbo">Groq Whisper Large V3 Turbo (Cloud API, Ultra Fast)</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label for="llm-model">AI Summarizer & Analyst Model</label>
+                        <select id="llm-model" class="select-field">
+                            <optgroup label="Meta (Groq)">
+                                <option value="llama-3.3-70b-versatile" selected>llama-3.3-70b-versatile (Recommended)</option>
+                                <option value="llama-3.1-8b-instant">llama-3.1-8b-instant (Fast)</option>
+                            </optgroup>
+                            <optgroup label="OpenAI (Groq)">
+                                <option value="openai/gpt-oss-120b">openai/gpt-oss-120b (Checked)</option>
+                                <option value="openai/gpt-oss-20b">openai/gpt-oss-20b</option>
+                                <option value="openai/gpt-oss-safeguard-20b">openai/gpt-oss-safeguard-20b</option>
+                            </optgroup>
+                            <optgroup label="Groq Native">
+                                <option value="groq/compound">groq/compound</option>
+                                <option value="groq/compound-mini">groq/compound-mini</option>
+                            </optgroup>
+                            <optgroup label="Canopy Labs">
+                                <option value="canopylabs/orpheus-v1-english">canopylabs/orpheus-v1-english</option>
+                                <option value="canopylabs/orpheus-arabic-saudi">canopylabs/orpheus-arabic-saudi</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+                <div class="action-bar">
+                    <button class="btn-primary" id="btn-upload" disabled>Process Audio</button>
+                </div>
+            </section>
+
+            <!-- Manual Transcript Input Section -->
+            <section class="card paste-card" id="paste-section">
+                <h3>Or Paste Meeting Transcript</h3>
+                <p class="section-desc" style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 16px;">Paste meeting transcript or notes manually to generate AI summary and extract action items directly.</p>
+                <div class="setting-group">
+                    <textarea id="manual-transcript" class="textarea-field" placeholder="Paste meeting transcript or notes manually here...
+
+Example:
+Today we discussed Kubernetes deployment, cloud optimization, and CI/CD improvements.
+
+Rahul will configure SSL by Friday.
+
+Priya will complete Terraform setup before Monday.
+
+The team approved AWS EKS for production deployment."></textarea>
+                </div>
+                <div class="action-bar" style="margin-top: 20px;">
+                    <button class="btn-primary" id="btn-process-text">Process Transcript</button>
+                </div>
+            </section>
+
+            <!-- Loading Indicator -->
+            <section class="card status-card" id="status-card" style="display: none;">
+                <div class="loader-content">
+                    <div class="spinner"></div>
+                    <h3 id="status-heading">Processing your meeting...</h3>
+                    <p id="status-subtext">This may take a minute or two as we run Whisper locally on your CPU and analyze the content.</p>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="progress-bar-fill" style="width: 0%;"></div>
+                    </div>
+                    <ul class="status-steps">
+                        <li id="step-transcribe" class="pending">Transcribing audio (Whisper)...</li>
+                        <li id="step-summarize" class="pending">Generating executive summary...</li>
+                        <li id="step-actions" class="pending">Extracting action items...</li>
+                        <li id="step-decisions" class="pending">Storing meeting in knowledge databases...</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Results Section (Initially Hidden) -->
+            <div class="results-grid" id="results-section" style="display: none;">
+                
+                <!-- Title & Meta Data -->
+                <div class="results-header card">
+                    <div class="title-bar">
+                        <span class="badge">Success</span>
+                        <h2 id="result-title">Meeting Title</h2>
+                    </div>
+                </div>
+
+                <!-- Executive Summary & Decisions -->
+                <div class="column-left">
+                    <section class="card summary-card">
+                        <h3>Executive Summary</h3>
+                        <div class="card-content" id="result-summary">
+                            <!-- Injected by JS -->
+                        </div>
+                    </section>
+
+                    <section class="card decisions-card">
+                        <h3>Key Decisions</h3>
+                        <div class="card-content" id="result-decisions">
+                            <!-- Injected by JS -->
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Action Items & Transcript -->
+                <div class="column-right">
+                    <section class="card action-items-card">
+                        <h3>Action Items</h3>
+                        <div class="card-content">
+                            <ul class="action-list" id="result-actions">
+                                <!-- Injected by JS -->
+                            </ul>
+                        </div>
+                    </section>
+
+                    <section class="card transcript-card">
+                        <div class="card-header-toggle">
+                            <h3>Full Transcript</h3>
+                            <button class="btn-toggle" id="btn-toggle-transcript">Show</button>
+                        </div>
+                        <div class="card-content collapsed" id="result-transcript-wrapper">
+                            <p id="result-transcript"></p>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Script Entrypoint -->
+    <script src="script.js"></script>
+</body>
+</html>
