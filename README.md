@@ -338,11 +338,8 @@ The system looks for key variables to bootstrap critical pipelines:
 
 ## 14. Application Visual Previews
 
-### Landing Dashboard
-![Landing Dashboard View](https://placehold.co/1200x675/f8fafc/0f172a?text=AI+Meeting+Notes+Summarizer+Landing+Dashboard+Mock)
-
-### Analytical Processing Layout
-![Analytical Processing Layout View](https://placehold.co/1200x675/ffffff/475569?text=Executive+Summary,+Key+Decisions,+and+Action+Items+Dashboard+Mock)
+### Application Dashboard & Manual Transcript Interface
+![Application Dashboard](photo/image.png)
 
 ---
 
